@@ -5,5 +5,5 @@ async fn main() {
         .unwrap();
     println!("Status: {}", res.status());
     let body = res.text().await.unwrap();
-    println!("Body: {body}")
+    println!("Body: {}", body)
 }
