@@ -1,0 +1,1 @@
+Trying out https://fasterthanli.me/series/building-a-rust-service-with-nix for fun (I'm fun)
