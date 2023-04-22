@@ -1,5 +1,9 @@
+use std::str::FromStr;
+
 use reqwest::StatusCode;
 use serde::Deserialize;
+use tracing::{info, Level};
+use tracing_subscriber::{filter::Targets, layer::SubscriberExt, util::SubscriberInitExt};
 
 use axum::{
     body::BoxBody,
@@ -11,9 +15,19 @@ use axum::{
 
 #[tokio::main]
 async fn main() {
-    let app = Router::new().route("/", get(root_get));
+    let filter = Targets::from_str(std::env::var("RUST_LOG").as_deref().unwrap_or("info"))
+        .expect("RUST_LOG should be a valid tracing filter (text key-values of <target>=<level>)");
+    tracing_subscriber::fmt()
+        .with_max_level(Level::TRACE)
+        .json()
+        .finish()
+        .with(filter)
+        .init();
 
-    axum::Server::bind(&"0.0.0.0:8080".parse().unwrap())
+    let app = Router::new().route("/", get(root_get));
+    let server_address = "0.0.0.0:8080".parse().unwrap();
+    info!("Listening on {server_address}");
+    axum::Server::bind(&server_address)
         .serve(app.into_make_service())
         .await
         .unwrap();
