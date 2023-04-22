@@ -1,3 +1,4 @@
+use core::panic;
 use std::str::FromStr;
 
 use reqwest::StatusCode;
@@ -24,7 +25,10 @@ async fn main() {
         .with(filter)
         .init();
 
-    let app = Router::new().route("/", get(root_get));
+    let app = Router::new()
+        .route("/", get(root_get))
+        .route("/panic", get(|| async { panic!("YEET") }));
+
     let server_address = "0.0.0.0:8080".parse().unwrap();
     info!("Listening on {server_address}");
     axum::Server::bind(&server_address)
